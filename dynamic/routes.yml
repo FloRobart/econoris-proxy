@@ -29,6 +29,16 @@ http:
         - econoris-vitrine-redirect-www
       service: econoris-vitrine
 
+    # Former address of the web application, still in the bookmarks of the users
+    econoris-legacy-app:
+      rule: "Host(`econoris.florobart.fr`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - econoris-legacy-app-redirect
+      # Nothing is served: the middleware answers with the redirection
+      service: noop@internal
+
   services:
     econoris-api:
       loadBalancer:
@@ -63,4 +73,12 @@ http:
       redirectRegex:
         regex: '^https?://www\.econoris\.fr/(.*)'
         replacement: "https://econoris.fr/${1}"
+        permanent: true
+
+    # econoris.florobart.fr -> econoris.fr (301), whatever the page: the pages of the former
+    # web application do not exist on the presentation site, which links to the new one
+    econoris-legacy-app-redirect:
+      redirectRegex:
+        regex: '^https?://econoris\.florobart\.fr/.*'
+        replacement: "https://econoris.fr/"
         permanent: true

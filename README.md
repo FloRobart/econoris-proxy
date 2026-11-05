@@ -11,6 +11,7 @@ Ce dépôt déclare tout ce qui est exposé : les routes, et ce qui leur est com
 - [Structure](#structure)
 - [Mettre en service](#mettre-en-service)
 - [Exposer un service](#exposer-un-service)
+- [Ancienne adresse](#ancienne-adresse)
 - [Limite de requêtes](#limite-de-requêtes)
 - [Mettre à jour Traefik](#mettre-à-jour-traefik)
 - [Sécurité](#sécurité)
@@ -90,6 +91,12 @@ Il n'y a rien d'autre à déclarer : le certificat `le`, les en-têtes de sécur
 **Le service ne publie aucun port.** C'est la responsabilité de chaque dépôt : un port publié contourne Traefik, donc le HTTPS et la limite de requêtes, et Docker l'ouvre même si le pare-feu du serveur le bloque.
 
 Si un service est arrêté, sa route reste déclarée : le visiteur reçoit une erreur `502` ou `503`.
+
+# Ancienne adresse
+
+`econoris.florobart.fr`, l'ancienne adresse de l'application web, redirige vers `econoris.fr` (redirection permanente `301`), quelle que soit la page demandée : les favoris des utilisateurs mènent au site vitrine, qui renvoie vers l'application. L'ancienne adresse de l'API n'est plus servie.
+
+La redirection se fait ici et non dans le DNS : le DNS ne fait que diriger le navigateur vers le serveur, c'est Traefik qui doit lui répondre en HTTPS, avec un certificat pour l'ancien domaine. L'enregistrement `A` de `econoris.florobart.fr` doit donc rester en place tant que la redirection est utile. Pour la supprimer, retirer le routeur `econoris-legacy-app` et son middleware de `dynamic/routes.yml`.
 
 # Limite de requêtes
 
