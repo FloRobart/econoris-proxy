@@ -1,0 +1,66 @@
+# Everything Traefik exposes: a service that is not listed here cannot be reached from outside.
+#
+# Traefik reaches each service by its name, on the network of that service. The
+# docker-compose.override.yml of econoris-wrapper connects Traefik to these networks.
+#
+# HTTPS, the certificate, the security headers and the rate limit come from the "websecure"
+# entrypoint. A "tls" key must not be added to a router: Traefik would serve its default
+# certificate instead of the Let's Encrypt one.
+
+http:
+  routers:
+    econoris-api:
+      rule: "Host(`api.econoris.fr`)"
+      entryPoints:
+        - websecure
+      service: econoris-api
+
+    econoris-app:
+      rule: "Host(`app.econoris.fr`)"
+      entryPoints:
+        - websecure
+      service: econoris-app
+
+    econoris-vitrine:
+      rule: "Host(`econoris.fr`) || Host(`www.econoris.fr`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - econoris-vitrine-redirect-www
+      service: econoris-vitrine
+
+  services:
+    econoris-api:
+      loadBalancer:
+        servers:
+          - url: "http://econoris-api:80"
+        healthCheck:
+          path: /
+          interval: 10s
+          timeout: 5s
+
+    econoris-app:
+      loadBalancer:
+        servers:
+          - url: "http://econoris-app:8080"
+        healthCheck:
+          path: /
+          interval: 10s
+          timeout: 5s
+
+    econoris-vitrine:
+      loadBalancer:
+        servers:
+          - url: "http://econoris-vitrine:8080"
+        healthCheck:
+          path: /
+          interval: 10s
+          timeout: 5s
+
+  middlewares:
+    # www.econoris.fr -> econoris.fr (301): a single canonical URL for SEO
+    econoris-vitrine-redirect-www:
+      redirectRegex:
+        regex: '^https?://www\.econoris\.fr/(.*)'
+        replacement: "https://econoris.fr/${1}"
+        permanent: true
