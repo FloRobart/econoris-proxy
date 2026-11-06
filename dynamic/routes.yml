@@ -39,6 +39,16 @@ http:
       # Nothing is served: the middleware answers with the redirection
       service: noop@internal
 
+    # Transition: former address of the API, still called by the browser extension
+    # (v1.0.2 and older) until its users receive the version using api.econoris.fr.
+    # Served rather than redirected: a redirection would lose the body of the POST requests.
+    # To remove once the stores have distributed the new version of the extension.
+    econoris-legacy-api:
+      rule: "Host(`econoris-server.florobart.fr`)"
+      entryPoints:
+        - websecure
+      service: econoris-api
+
   services:
     econoris-api:
       loadBalancer:
