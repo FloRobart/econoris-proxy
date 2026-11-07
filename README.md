@@ -108,9 +108,9 @@ Un routeur de `dynamic/routes.yml` peut ajouter une limite plus stricte, par exe
 
 # Mettre à jour Traefik
 
-L'image est figée sur une version et un digest, donc **les correctifs de sécurité ne s'installent pas seuls**. Traefik publie souvent : il faut suivre [ses releases](https://github.com/traefik/traefik/releases).
+L'image est figée sur une version et un digest, donc **les correctifs de sécurité ne s'installent pas seuls**. Dependabot ([.github/dependabot.yml](.github/dependabot.yml)) vérifie chaque mois les nouvelles versions et ouvre une pull request vers `dev` qui change la version et le digest dans les deux services de `docker-compose.yml`. Traefik publie souvent : pour une faille urgente, suivre [ses releases](https://github.com/traefik/traefik/releases) sans attendre Dependabot.
 
-Pour mettre à jour, changer la version et le digest de `x-traefik-image` dans `docker-compose.yml`, publier sur `main`, puis lancer le `deploy.sh` du wrapper.
+Pour mettre à jour à la main, changer la version et le digest des deux lignes `image: traefik:…` de `docker-compose.yml`, toujours ensemble. Une fois la mise à jour publiée sur `main`, lancer le `deploy.sh` du wrapper.
 
 # Sécurité
 
